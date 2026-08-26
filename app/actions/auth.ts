@@ -70,7 +70,7 @@ export async function signup(state: AuthState, formData: FormData): Promise<Auth
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/check-email')
 }
 
 export async function logout() {
