@@ -7,6 +7,15 @@ import type { BuyBoxDraft } from '@/lib/scoring'
 async function getAuthUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const existing = await db.orm.public.User.where({ id: user.id }).first()
+  if (!existing) {
+    await db.orm.public.User.create({
+      id: user.id,
+      email: user.email!,
+      name: user.user_metadata?.name ?? null,
+    })
+  }
   return user
 }
 
