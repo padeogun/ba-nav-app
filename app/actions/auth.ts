@@ -57,11 +57,13 @@ export async function signup(state: AuthState, formData: FormData): Promise<Auth
   }
 
   const supabase = await createClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ba-nav-app.vercel.app'
   const { error } = await supabase.auth.signUp({
     email: validated.data.email,
     password: validated.data.password,
     options: {
       data: { name: validated.data.name },
+      emailRedirectTo: `${siteUrl}/auth/callback`,
     },
   })
 

@@ -3,8 +3,11 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+  const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
+
+  // Use NEXT_PUBLIC_SITE_URL so the redirect is always https on Vercel
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ba-nav-app.vercel.app'
 
   if (code) {
     const cookieStore = await cookies()
@@ -25,9 +28,9 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      return NextResponse.redirect(`${origin}/dashboard`)
+      return NextResponse.redirect(`${siteUrl}/dashboard`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?error=auth`)
+  return NextResponse.redirect(`${siteUrl}/login?error=auth`)
 }
