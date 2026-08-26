@@ -1,26 +1,211 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #1B2430;
+  --ink-soft: #333F4E;
+  --paper: #F3F1EA;
+  --paper-2: #EAE6DA;
+  --line: #D8D2C2;
+  --brass: #96712F;
+  --brass-soft: #B8935A;
+  --teal: #1F5C56;
+  --teal-soft: #DCEAE7;
+  --rust: #8C3A2B;
+  --rust-soft: #F3E1DC;
+  --amber: #8A6A16;
+  --amber-soft: #F2E7C9;
+  --muted: #6B6455;
+  --white: #FFFDF8;
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --sans: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-line: var(--line);
+  --color-brass: var(--brass);
+  --color-brass-soft: var(--brass-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-rust: var(--rust);
+  --color-rust-soft: var(--rust-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-muted: var(--muted);
+  --color-warm-white: var(--white);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+/* Ledger rule overlay — apply to a positioned container */
+.ledger-lines {
+  position: relative;
+}
+.ledger-lines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 27px,
+    rgba(27, 36, 48, 0.028) 27px 28px
+  );
+}
+
+/* Shared form element base */
+.ban-input,
+.ban-select,
+.ban-textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink);
+  padding: 9px 11px;
+  border-radius: 2px;
+  font-size: 13.5px;
+  font-family: var(--sans);
+}
+.ban-input:focus,
+.ban-select:focus,
+.ban-textarea:focus {
+  outline: 2px solid var(--brass-soft);
+  outline-offset: 1px;
+  border-color: var(--brass);
+}
+
+/* Likert scale buttons */
+.ban-likert-btn {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--muted);
+  transition: background 0.1s, color 0.1s;
+}
+.ban-likert-btn.selected {
+  background: var(--ink);
+  color: var(--white);
+  border-color: var(--ink);
+}
+.ban-likert-btn:first-child { border-radius: 2px 0 0 2px; }
+.ban-likert-btn:last-child  { border-radius: 0 2px 2px 2px; }
+
+/* Progress bar */
+.ban-progress-track {
+  height: 5px;
+  background: var(--paper-2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ban-progress-fill {
+  height: 100%;
+  background: var(--brass);
+  transition: width 0.4s ease;
+}
+
+/* Slider */
+.ban-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  outline: none;
+}
+.ban-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--brass);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 1px var(--brass);
+  cursor: pointer;
+}
+
+/* Fade-in animation */
+.ban-fade-in {
+  animation: banFadeIn 0.35s ease both;
+}
+@keyframes banFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ban-fade-in { animation: none; }
+}
+
+/* Scrollbar */
+.ban-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.ban-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+/* Button base */
+.ban-btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 2px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+  transition: opacity .1s;
+}
+.ban-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ban-btn-ghost { background: transparent; color: var(--muted); }
+.ban-btn-brass { background: var(--brass); border-color: var(--brass); color: var(--white); }
+.ban-btn-primary { background: var(--ink); border-color: var(--ink); color: var(--white); }
+
+/* Responsive grid utilities */
+.ban-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+.ban-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* Sidebar layout */
+.ban-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 900px) {
+  .ban-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .ban-grid-4 { grid-template-columns: 1fr; }
+  .ban-grid-2 { grid-template-columns: 1fr; }
+  .ban-sidebar { display: none; }
+  .ban-main-padding { padding: 20px !important; }
 }

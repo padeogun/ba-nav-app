@@ -1,0 +1,134 @@
+// use prisma-next
+
+model User {
+  id        Uuid              @id
+  email     String            @unique
+  name      String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model Motivation {
+  id                   Uuid              @id @default(uuid())
+  userId               Uuid              @unique
+  scores               Jsonb
+  why                  String?
+  changes              String?
+  twoYears             String?
+  failureDespiteProfit String?
+  completed            Boolean           @default(false)
+  createdAt            TimestamptzString @default(now())
+  updatedAt            temporal.updatedAtString()
+}
+
+model Temperament {
+  id        Uuid              @id @default(uuid())
+  userId    Uuid              @unique
+  scores    Jsonb
+  completed Boolean           @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model OwnershipStyle {
+  id        Uuid              @id @default(uuid())
+  userId    Uuid              @unique
+  scores    Jsonb
+  completed Boolean           @default(false)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model CapabilityRating {
+  id       Uuid    @id @default(uuid())
+  userId   Uuid
+  skillKey String
+  rating   Int
+  enjoy    Boolean @default(false)
+
+  @@unique([userId, skillKey])
+}
+
+model FinancialReadiness {
+  id                Uuid              @id @default(uuid())
+  userId            Uuid              @unique
+  capitalAvailable  Float?
+  riskCapital       Float?
+  existingDebt      Float?
+  additionalCapital Float?
+  desiredSize       Float?
+  minHouseholdIncome Float?
+  desiredDrawings   Float?
+  maxGuarantee      Float?
+  reserveMonths     String            @default("6")
+  maxLeverage       String            @default("moderate")
+  completed         Boolean           @default(false)
+  createdAt         TimestamptzString @default(now())
+  updatedAt         temporal.updatedAtString()
+}
+
+model RiskRating {
+  id        Uuid   @id @default(uuid())
+  userId    Uuid
+  riskKey   String
+  tolerance Int
+
+  @@unique([userId, riskKey])
+}
+
+model Lifestyle {
+  id                  Uuid              @id @default(uuid())
+  userId              Uuid              @unique
+  weeklyHours         Int               @default(45)
+  maxCommute          Int               @default(45)
+  weekendTolerance    String            @default("occasional")
+  emergencyTolerance  String            @default("sometimes")
+  travelTolerance     String            @default("regional")
+  customerFacing      String            @default("yes")
+  relocate            String            @default("no")
+  remotePref          String            @default("hybrid")
+  longTermInvolvement String            @default("owner-manager")
+  minPersonalIncome   Float             @default(0)
+  completed           Boolean           @default(false)
+  createdAt           TimestamptzString @default(now())
+  updatedAt           temporal.updatedAtString()
+}
+
+model SectorInterest {
+  id       Uuid   @id @default(uuid())
+  userId   Uuid
+  sectorId String
+
+  @@unique([userId, sectorId])
+}
+
+model BuyBox {
+  id                       Uuid              @id @default(uuid())
+  userId                   Uuid              @unique
+  geography                String            @default("United Kingdom")
+  maxDistance              String            @default("45")
+  sectorsPreferred         String            @default("")
+  sectorsExcluded          String            @default("")
+  revenueMin               String            @default("")
+  revenueMax               String            @default("")
+  ebitdaMin                String            @default("")
+  ebitdaMax                String            @default("")
+  priceMin                 String            @default("")
+  priceMax                 String            @default("")
+  employeeMin              String            @default("")
+  employeeMax              String            @default("")
+  minMargin                String            @default("10")
+  minRecurring             String            @default("30")
+  maxCustomerConcentration String            @default("25")
+  maxSupplierConcentration String            @default("30")
+  minYearsTrading          String            @default("3")
+  cashConversion           String            @default("moderate-to-high")
+  maxCapex                 String            @default("low")
+  maxSellerDependency      String            @default("moderate")
+  maxOwnerHours            String            @default("45")
+  dealTypes                String            @default("")
+  ownershipModel           String            @default("Owner/operator")
+  completed                Boolean           @default(false)
+  createdAt                TimestamptzString @default(now())
+  updatedAt                temporal.updatedAtString()
+}
