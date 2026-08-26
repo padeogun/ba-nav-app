@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useTransition } from 'react'
+import { useTransition, useState } from 'react'
 
 interface ModuleNavProps {
   prevHref?: string
@@ -13,22 +13,36 @@ interface ModuleNavProps {
 export default function ModuleNav({ prevHref, nextHref, onSave, canComplete = true }: ModuleNavProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const handleSave = () => {
+    setSaveError(null)
     startTransition(async () => {
-      await onSave(false)
+      const result = await onSave(false)
+      if (result.error) setSaveError(result.error)
     })
   }
 
   const handleNext = () => {
+    setSaveError(null)
     startTransition(async () => {
       const result = await onSave(true)
-      if (!result.error && nextHref) router.push(nextHref)
+      if (result.error) {
+        setSaveError(result.error)
+      } else if (nextHref) {
+        router.push(nextHref)
+      }
     })
   }
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 28, paddingTop: 20, borderTop: '1px solid var(--line)' }}>
+    <div style={{ marginTop: 28, borderTop: '1px solid var(--line)', paddingTop: 20 }}>
+      {saveError && (
+        <div style={{ marginBottom: 12, padding: '10px 14px', background: '#fff0f0', border: '1px solid var(--rust)', borderRadius: 3, fontSize: 12.5, color: 'var(--rust)', fontFamily: 'var(--mono)', wordBreak: 'break-all' }}>
+          Save failed: {saveError}
+        </div>
+      )}
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div style={{ display: 'flex', gap: 8 }}>
         {prevHref && (
           <button className="ban-btn ban-btn-ghost ban-focus" type="button" onClick={() => router.push(prevHref)} disabled={pending}>
@@ -59,6 +73,7 @@ export default function ModuleNav({ prevHref, nextHref, onSave, canComplete = tr
           {pending ? 'Saving…' : 'Save & finish'}
         </button>
       )}
+    </div>
     </div>
   )
 }
