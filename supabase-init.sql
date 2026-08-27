@@ -1,7 +1,7 @@
 -- BA Nav Phase 1 + 2 schema
 -- Paste and run in Supabase SQL Editor (Dashboard → SQL Editor → New query)
 
-CREATE TABLE IF NOT EXISTS "User" (
+CREATE TABLE IF NOT EXISTS "user" (
   "id"        UUID        PRIMARY KEY,
   "email"     TEXT        NOT NULL UNIQUE,
   "name"      TEXT,
@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS "User" (
   "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "Motivation" (
+CREATE TABLE IF NOT EXISTS motivation (
   "id"                   UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"               UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"               UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "scores"               JSONB       NOT NULL DEFAULT '{}',
   "why"                  TEXT,
   "changes"              TEXT,
@@ -22,36 +22,36 @@ CREATE TABLE IF NOT EXISTS "Motivation" (
   "updatedAt"            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "Temperament" (
+CREATE TABLE IF NOT EXISTS temperament (
   "id"        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"    UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"    UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "scores"    JSONB       NOT NULL DEFAULT '{}',
   "completed" BOOLEAN     NOT NULL DEFAULT FALSE,
   "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "OwnershipStyle" (
+CREATE TABLE IF NOT EXISTS "ownershipStyle" (
   "id"        UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"    UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"    UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "scores"    JSONB       NOT NULL DEFAULT '{}',
   "completed" BOOLEAN     NOT NULL DEFAULT FALSE,
   "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "CapabilityRating" (
+CREATE TABLE IF NOT EXISTS "capabilityRating" (
   "id"       UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"   UUID    NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"   UUID    NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
   "skillKey" TEXT    NOT NULL,
   "rating"   INTEGER NOT NULL,
   "enjoy"    BOOLEAN NOT NULL DEFAULT FALSE,
   UNIQUE ("userId", "skillKey")
 );
 
-CREATE TABLE IF NOT EXISTS "FinancialReadiness" (
+CREATE TABLE IF NOT EXISTS "financialReadiness" (
   "id"                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"            UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"            UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "capitalAvailable"  FLOAT8,
   "riskCapital"       FLOAT8,
   "existingDebt"      FLOAT8,
@@ -67,17 +67,17 @@ CREATE TABLE IF NOT EXISTS "FinancialReadiness" (
   "updatedAt"         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS "RiskRating" (
+CREATE TABLE IF NOT EXISTS "riskRating" (
   "id"        UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"    UUID    NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"    UUID    NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
   "riskKey"   TEXT    NOT NULL,
   "tolerance" INTEGER NOT NULL,
   UNIQUE ("userId", "riskKey")
 );
 
-CREATE TABLE IF NOT EXISTS "Lifestyle" (
+CREATE TABLE IF NOT EXISTS lifestyle (
   "id"                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"              UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"              UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "weeklyHours"         INTEGER     NOT NULL DEFAULT 45,
   "maxCommute"          INTEGER     NOT NULL DEFAULT 45,
   "weekendTolerance"    TEXT        NOT NULL DEFAULT 'occasional',
@@ -95,16 +95,16 @@ CREATE TABLE IF NOT EXISTS "Lifestyle" (
 
 -- Phase 3 tables
 
-CREATE TABLE IF NOT EXISTS "SectorInterest" (
+CREATE TABLE IF NOT EXISTS "sectorInterest" (
   "id"       UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"   UUID    NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"   UUID    NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
   "sectorId" TEXT    NOT NULL,
   UNIQUE ("userId", "sectorId")
 );
 
-CREATE TABLE IF NOT EXISTS "BuyBox" (
+CREATE TABLE IF NOT EXISTS "buyBox" (
   "id"                       UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  "userId"                   UUID        NOT NULL UNIQUE REFERENCES "User"("id") ON DELETE CASCADE,
+  "userId"                   UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
   "geography"                TEXT        NOT NULL DEFAULT 'United Kingdom',
   "maxDistance"              TEXT        NOT NULL DEFAULT '45',
   "sectorsPreferred"         TEXT        NOT NULL DEFAULT '',
