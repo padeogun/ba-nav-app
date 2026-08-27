@@ -15,9 +15,16 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
   const q = searchParams.get('q')
   const number = searchParams.get('number')
+  const data = searchParams.get('data')
 
   let url: string
-  if (number) {
+  if (number && data === 'officers') {
+    url = `${CH_BASE}/company/${encodeURIComponent(number.trim())}/officers?items_per_page=50`
+  } else if (number && data === 'psc') {
+    url = `${CH_BASE}/company/${encodeURIComponent(number.trim())}/persons-with-significant-control`
+  } else if (number && data === 'filings') {
+    url = `${CH_BASE}/company/${encodeURIComponent(number.trim())}/filing-history?items_per_page=20`
+  } else if (number) {
     url = `${CH_BASE}/company/${encodeURIComponent(number.trim())}`
   } else if (q) {
     url = `${CH_BASE}/search/companies?q=${encodeURIComponent(q.trim())}&items_per_page=8`

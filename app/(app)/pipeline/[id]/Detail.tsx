@@ -6,6 +6,7 @@ import { updateOpportunity, moveStage, deleteOpportunity } from '@/app/actions/p
 import { scoreOpportunity, type BuyBoxDraft } from '@/lib/scoring'
 import { SECTOR_DB } from '@/lib/constants'
 import CompaniesHousePanel from '@/components/pipeline/CompaniesHousePanel'
+import CHDataPanel from '@/components/pipeline/CHDataPanel'
 
 const STAGES = [
   { key: 'saved', label: 'Saved' },
@@ -178,6 +179,11 @@ export default function OpportunityDetail({ opp, buyBox }: { opp: any; buyBox: B
             onLink={setChFields}
             onUnlink={() => setChFields({ chCompanyNumber: '', chCompanyName: '', chStatus: '', chSicCodes: '', chIncorporatedOn: '' })}
           />
+
+          {/* CH deep data — officers, PSC, filing history */}
+          {fields.chCompanyNumber && (
+            <CHDataPanel companyNumber={fields.chCompanyNumber} />
+          )}
 
           {/* Notes */}
           <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 3, padding: 22 }}>
