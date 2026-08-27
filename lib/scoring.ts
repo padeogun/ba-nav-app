@@ -282,6 +282,61 @@ export function draftBuyBox(
   }
 }
 
+export type OpportunityInput = {
+  askingPrice: string
+  ebitda: string
+  revenue: string
+  employees: string
+  yearsTrading: string
+  sector: string
+}
+
+export function scoreOpportunity(opp: OpportunityInput, bb: BuyBoxDraft): { score: number; flags: string[] } {
+  const p = (s: string) => { const n = parseFloat(s); return isNaN(n) ? null : n }
+  const flags: string[] = []
+  let score = 100
+
+  const price = p(opp.askingPrice)
+  const priceMax = p(bb.priceMax)
+  const priceMin = p(bb.priceMin)
+  if (price !== null && priceMax !== null && price > priceMax) {
+    score -= 30
+    flags.push(`Asking price £${price.toLocaleString()} exceeds your Buy Box maximum of £${priceMax.toLocaleString()}`)
+  } else if (price !== null && priceMin !== null && price < priceMin) {
+    flags.push(`Asking price is below your minimum — may indicate thin margins`)
+  }
+
+  const ebitda = p(opp.ebitda)
+  const ebitdaMin = p(bb.ebitdaMin)
+  const ebitdaMax = p(bb.ebitdaMax)
+  if (ebitda !== null && ebitdaMin !== null && ebitda < ebitdaMin) {
+    score -= 25
+    flags.push(`EBITDA £${ebitda.toLocaleString()} is below your target minimum of £${ebitdaMin.toLocaleString()}`)
+  } else if (ebitda !== null && ebitdaMax !== null && ebitda > ebitdaMax) {
+    score -= 5
+    flags.push(`EBITDA £${ebitda.toLocaleString()} exceeds your target maximum — may be outside price range`)
+  }
+
+  const years = p(opp.yearsTrading)
+  const minYears = p(bb.minYearsTrading)
+  if (years !== null && minYears !== null && years < minYears) {
+    score -= 20
+    flags.push(`${years} years trading — below your Buy Box minimum of ${minYears}`)
+  }
+
+  if (opp.sector) {
+    if (bb.sectorsExcluded.includes(opp.sector)) {
+      score -= 10
+      flags.push('You excluded this sector from your Buy Box')
+    } else if (bb.sectorsPreferred.length > 0 && !bb.sectorsPreferred.includes(opp.sector)) {
+      score -= 5
+      flags.push('Sector is not in your Buy Box preferred list')
+    }
+  }
+
+  return { score: Math.max(0, score), flags }
+}
+
 export function buyBoxThesis(bb: BuyBoxDraft, sectorScores: ReturnType<typeof computeAllSectorScores>): string {
   const topNames = (bb.sectorsPreferred || [])
     .map((id) => SECTOR_DB.find((s) => s.id === id)?.name)

@@ -102,6 +102,31 @@ model SectorInterest {
   @@unique([userId, sectorId])
 }
 
+model Opportunity {
+  id               Uuid              @id @default(uuid())
+  userId           Uuid
+  title            String
+  url              String            @default("")
+  sector           String            @default("")
+  askingPrice      String            @default("")
+  ebitda           String            @default("")
+  revenue          String            @default("")
+  employees        String            @default("")
+  yearsTrading     String            @default("")
+  location         String            @default("")
+  notes            String            @default("")
+  stage            String            @default("saved")
+  score            String            @default("")
+  scoreFlags       String            @default("")
+  chCompanyNumber  String            @default("")
+  chCompanyName    String            @default("")
+  chStatus         String            @default("")
+  chSicCodes       String            @default("")
+  chIncorporatedOn String            @default("")
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+}
+
 model BuyBox {
   id                       Uuid              @id @default(uuid())
   userId                   Uuid              @unique

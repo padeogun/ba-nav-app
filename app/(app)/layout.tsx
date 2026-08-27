@@ -9,6 +9,7 @@ import {
   Layers,
   LogOut,
   Compass,
+  Briefcase,
 } from 'lucide-react'
 
 const NAV = [
@@ -22,6 +23,7 @@ const NAV = [
   { href: '/assessment/lifestyle', label: 'Lifestyle', icon: ClipboardList, phase: 2 },
   { href: '/sectors', label: 'Sector matching', icon: Layers, phase: 3 },
   { href: '/buy-box', label: 'Buy Box', icon: Target, phase: 3 },
+  { href: '/pipeline', label: 'Pipeline', icon: Briefcase, phase: 3 },
 ]
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

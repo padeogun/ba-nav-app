@@ -102,6 +102,31 @@ CREATE TABLE IF NOT EXISTS "sectorInterest" (
   UNIQUE ("userId", "sectorId")
 );
 
+CREATE TABLE IF NOT EXISTS opportunity (
+  "id"               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  "userId"           UUID        NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
+  "title"            TEXT        NOT NULL,
+  "url"              TEXT        NOT NULL DEFAULT '',
+  "sector"           TEXT        NOT NULL DEFAULT '',
+  "askingPrice"      TEXT        NOT NULL DEFAULT '',
+  "ebitda"           TEXT        NOT NULL DEFAULT '',
+  "revenue"          TEXT        NOT NULL DEFAULT '',
+  "employees"        TEXT        NOT NULL DEFAULT '',
+  "yearsTrading"     TEXT        NOT NULL DEFAULT '',
+  "location"         TEXT        NOT NULL DEFAULT '',
+  "notes"            TEXT        NOT NULL DEFAULT '',
+  "stage"            TEXT        NOT NULL DEFAULT 'saved',
+  "score"            TEXT        NOT NULL DEFAULT '',
+  "scoreFlags"       TEXT        NOT NULL DEFAULT '',
+  "chCompanyNumber"  TEXT        NOT NULL DEFAULT '',
+  "chCompanyName"    TEXT        NOT NULL DEFAULT '',
+  "chStatus"         TEXT        NOT NULL DEFAULT '',
+  "chSicCodes"       TEXT        NOT NULL DEFAULT '',
+  "chIncorporatedOn" TEXT        NOT NULL DEFAULT '',
+  "createdAt"        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updatedAt"        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS "buyBox" (
   "id"                       UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   "userId"                   UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,
