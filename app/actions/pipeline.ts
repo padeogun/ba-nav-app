@@ -110,6 +110,23 @@ export async function moveStage(id: string, stage: string) {
   } catch (e) { return { error: String(e) } }
 }
 
+export async function saveAnalysis(id: string, updates: {
+  qualityScores?: string
+  ownerDepScores?: string
+  redFlags?: string
+  fitScores?: string
+}): Promise<{ error?: string }> {
+  const user = await getAuthUser()
+  if (!user) return { error: 'Not authenticated' }
+  try {
+    const existing = await db.orm.public.Opportunity.where({ id, userId: user.id }).first()
+    if (!existing) return { error: 'Opportunity not found' }
+    await db.orm.public.Opportunity.where({ id, userId: user.id }).update(updates)
+    revalidatePath(`/pipeline/${id}`)
+    return {}
+  } catch (e) { return { error: String(e) } }
+}
+
 export async function deleteOpportunity(id: string) {
   const user = await getAuthUser()
   if (!user) return { error: 'Not authenticated' }

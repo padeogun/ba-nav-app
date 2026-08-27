@@ -7,6 +7,10 @@ import { scoreOpportunity, type BuyBoxDraft } from '@/lib/scoring'
 import { SECTOR_DB } from '@/lib/constants'
 import CompaniesHousePanel from '@/components/pipeline/CompaniesHousePanel'
 import CHDataPanel from '@/components/pipeline/CHDataPanel'
+import Quality from '@/components/pipeline/tabs/Quality'
+import OwnerDep from '@/components/pipeline/tabs/OwnerDep'
+import RedFlagsTab from '@/components/pipeline/tabs/RedFlags'
+import FitDecision from '@/components/pipeline/tabs/FitDecision'
 
 const STAGES = [
   { key: 'saved', label: 'Saved' },
@@ -47,6 +51,7 @@ export default function OpportunityDetail({ opp, buyBox }: { opp: any; buyBox: B
   const [saved, setSaved] = useState(false)
   const [pending, startTransition] = useTransition()
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [tab, setTab] = useState<'listing' | 'quality' | 'dependency' | 'redflags' | 'decision'>('listing')
 
   const set = (k: keyof typeof fields, v: string) => { setFields((f) => ({ ...f, [k]: v })); setSaved(false) }
   const setChFields = (ch: { chCompanyNumber: string; chCompanyName: string; chStatus: string; chSicCodes: string; chIncorporatedOn: string }) => {
@@ -107,7 +112,45 @@ export default function OpportunityDetail({ opp, buyBox }: { opp: any; buyBox: B
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
+      {/* Tab bar */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid var(--line)', marginBottom: 28 }}>
+        {([
+          { key: 'listing',    label: 'Listing',           has: true },
+          { key: 'quality',    label: 'Business Quality',  has: !!opp.qualityScores },
+          { key: 'dependency', label: 'Owner Dependency',  has: !!opp.ownerDepScores },
+          { key: 'redflags',   label: 'Red Flags',         has: !!opp.redFlags },
+          { key: 'decision',   label: 'Fit & Decision',    has: !!opp.fitScores },
+        ] as { key: typeof tab; label: string; has: boolean }[]).map(t => (
+          <button key={t.key} type="button" onClick={() => setTab(t.key)} style={{
+            fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.06em', textTransform: 'uppercase',
+            padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer',
+            borderBottom: tab === t.key ? '2px solid var(--brass)' : '2px solid transparent',
+            marginBottom: -2, color: tab === t.key ? 'var(--ink)' : 'var(--muted)',
+            display: 'flex', alignItems: 'center', gap: 7,
+          }}>
+            {t.label}
+            {t.key !== 'listing' && (
+              <span style={{ width: 6, height: 6, borderRadius: '50%', display: 'inline-block', flexShrink: 0, background: t.has ? 'var(--brass)' : 'var(--line)' }} />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'quality' && <Quality oppId={opp.id} initial={opp.qualityScores ?? ''} />}
+      {tab === 'dependency' && <OwnerDep oppId={opp.id} initial={opp.ownerDepScores ?? ''} />}
+      {tab === 'redflags' && <RedFlagsTab oppId={opp.id} initial={opp.redFlags ?? ''} />}
+      {tab === 'decision' && (
+        <FitDecision
+          oppId={opp.id}
+          qualityInitial={opp.qualityScores ?? ''}
+          ownerDepInitial={opp.ownerDepScores ?? ''}
+          redFlagsInitial={opp.redFlags ?? ''}
+          fitInitial={opp.fitScores ?? ''}
+          buyBoxScore={live?.score ?? 0}
+        />
+      )}
+
+      {tab === 'listing' && <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}>
         {/* Left — editable fields */}
         <div style={{ display: 'grid', gap: 16 }}>
           {/* Listing details */}
@@ -288,7 +331,7 @@ export default function OpportunityDetail({ opp, buyBox }: { opp: any; buyBox: B
             Score updates as you edit. Save to persist the latest score to your pipeline list.
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -337,6 +337,182 @@ export function scoreOpportunity(opp: OpportunityInput, bb: BuyBoxDraft): { scor
   return { score: Math.max(0, score), flags }
 }
 
+// ── Analysis module types ────────────────────────────────────────────────────
+
+export type QualityScores = {
+  rq: number[]; pq: number[]; oq: number[]; sq: number[]; rkq: number[]
+}
+export type OwnerDepScores = Record<string, number>
+export type FlagRating = '' | 'green' | 'amber' | 'red' | 'breaker'
+export type RedFlags = Record<string, FlagRating>
+export type FitScores = Record<string, number>
+
+export function emptyQuality(): QualityScores {
+  return { rq: [0,0,0,0,0], pq: [0,0,0,0,0], oq: [0,0,0,0,0], sq: [0,0,0,0,0], rkq: [0,0,0,0,0] }
+}
+export const OWNER_DEP_KEYS = [
+  'sells','managesStaff','pricesWork','managesCustomers','approvesPurchasing',
+  'knowsSuppliers','understandsSystems','solvesTechnical','managesCash',
+  'holdsLicences','ownsRelationships','knowsEverything',
+] as const
+export const RED_FLAG_KEYS = [
+  'unclearAccounts','profitCashMismatch','excessiveAdjustments','customerConcentration',
+  'keyPersonDependency','sellerControlledSales','revenueDeclining','highTurnover',
+  'deferredCapex','supplierConcentration','litigation','regulatoryIssues','taxUncertainty',
+  'workingCapitalProblems','forecastDependentValuation','ddResistance',
+  'unconvincingReasonForSale','underpaidOwner','revenueMultipleNoEarnings','dealFever',
+] as const
+export const FIT_KEYS = [
+  'personalInterest','skillsFit','managementFit','financialFit','lifestyleFit',
+  'riskFit','strategicFit','abilityToAddValue','longTermWealthPotential',
+] as const
+
+export function emptyOwnerDep(): OwnerDepScores {
+  return Object.fromEntries(OWNER_DEP_KEYS.map(k => [k, 0]))
+}
+export function emptyRedFlags(): RedFlags {
+  return Object.fromEntries(RED_FLAG_KEYS.map(k => [k, ''])) as RedFlags
+}
+export function emptyFitScores(): FitScores {
+  return Object.fromEntries(FIT_KEYS.map(k => [k, 0]))
+}
+export function parseAnalysis<T>(json: string, fallback: T): T {
+  try { const v = JSON.parse(json); return v ?? fallback } catch { return fallback }
+}
+
+export type DecisionResult = {
+  recommendation: 'reject' | 'park' | 'gather-info' | 'investigate' | 'due-diligence' | 'offer'
+  personalFitScore: number
+  businessQualityScore: number
+  ownerDependencyScore: number
+  redFlagCounts: { breakers: number; reds: number; ambers: number }
+  blendedScore: number
+  reasons: string[]
+  risks: string[]
+  missingInfo: string[]
+  nextActions: string[]
+}
+
+export function computeDecision(opts: {
+  qualityScores: QualityScores
+  ownerDepScores: OwnerDepScores
+  redFlags: RedFlags
+  fitScores: FitScores
+  buyBoxScore: number
+}): DecisionResult {
+  const { qualityScores, ownerDepScores, redFlags, fitScores, buyBoxScore } = opts
+
+  const flagValues = Object.values(redFlags) as FlagRating[]
+  const breakers = flagValues.filter(f => f === 'breaker').length
+  const reds = flagValues.filter(f => f === 'red').length
+  const ambers = flagValues.filter(f => f === 'amber').length
+  const unassessed = flagValues.filter(f => f === '').length
+
+  const allQ = [...qualityScores.rq, ...qualityScores.pq, ...qualityScores.oq, ...qualityScores.sq, ...qualityScores.rkq]
+  const ratedQ = allQ.filter(v => v > 0)
+  const businessQualityScore = ratedQ.length ? Math.round(ratedQ.reduce((a,b)=>a+b,0)/ratedQ.length*20) : 0
+
+  const depVals = Object.values(ownerDepScores) as number[]
+  const ratedDep = depVals.filter(v => v > 0)
+  const ownerDependencyScore = ratedDep.length ? Math.round(ratedDep.reduce((a,b)=>a+b,0)/ratedDep.length*20) : 0
+
+  const fitVals = Object.values(fitScores) as number[]
+  const ratedFit = fitVals.filter(v => v > 0)
+  const personalFitScore = ratedFit.length ? Math.round(ratedFit.reduce((a,b)=>a+b,0)/ratedFit.length*10) : 0
+
+  const blendedScore = Math.round(
+    personalFitScore * 0.40 + businessQualityScore * 0.30 +
+    buyBoxScore * 0.20 + ownerDependencyScore * 0.10
+  )
+
+  let recommendation: DecisionResult['recommendation']
+  if (breakers > 0) recommendation = 'reject'
+  else if (reds >= 3 || (blendedScore < 30 && ratedFit.length >= 5)) recommendation = 'reject'
+  else if (reds >= 1 || (blendedScore < 45 && ratedFit.length >= 5)) recommendation = 'park'
+  else if (unassessed > 10 || ratedQ.length < 10 || ratedFit.length < 5) recommendation = 'gather-info'
+  else if (blendedScore < 55) recommendation = 'park'
+  else if (blendedScore < 65) recommendation = 'investigate'
+  else if (blendedScore < 78) recommendation = 'due-diligence'
+  else recommendation = 'offer'
+
+  const reasons: string[] = []
+  const risks: string[] = []
+  const missingInfo: string[] = []
+  const nextActions: string[] = []
+
+  if (breakers > 0) reasons.push(`${breakers} deal-breaker flag${breakers > 1 ? 's' : ''} — immediate disqualifier`)
+  if (reds > 0) reasons.push(`${reds} red flag${reds > 1 ? 's' : ''} requiring serious investigation`)
+  if (buyBoxScore >= 80) reasons.push(`Strong Buy Box alignment (${buyBoxScore}/100)`)
+  else if (buyBoxScore >= 60) reasons.push(`Reasonable Buy Box alignment (${buyBoxScore}/100)`)
+  else if (buyBoxScore > 0 && buyBoxScore < 60) reasons.push(`Weak Buy Box alignment (${buyBoxScore}/100)`)
+  if (personalFitScore >= 70) reasons.push(`Strong personal fit (${personalFitScore}/100)`)
+  else if (personalFitScore > 0 && personalFitScore < 50) reasons.push(`Low personal fit (${personalFitScore}/100)`)
+  if (businessQualityScore >= 70) reasons.push(`Good business quality indicators (${businessQualityScore}/100)`)
+  else if (businessQualityScore > 0 && businessQualityScore < 50) reasons.push(`Below-average business quality (${businessQualityScore}/100)`)
+  if (ownerDependencyScore >= 70 && ratedDep.length >= 8) reasons.push('Business appears operationally independent of the seller')
+
+  if (ownerDependencyScore < 50 && ratedDep.length >= 6) risks.push(`High owner dependency risk (${ownerDependencyScore}/100) — business relies heavily on the seller`)
+  if (ambers >= 3) risks.push(`${ambers} amber flags require detailed explanation before advancing`)
+  if (reds > 0) risks.push(`${reds} red flag${reds > 1 ? 's' : ''} identified — material concerns`)
+  const rkqR = qualityScores.rkq.filter(v=>v>0)
+  if (rkqR.length >= 3 && rkqR.reduce((a,b)=>a+b,0)/rkqR.length < 3) risks.push('Risk profile indicators are below average — elevated structural risk')
+  const rqR = qualityScores.rq.filter(v=>v>0)
+  if (rqR.length >= 3 && rqR.reduce((a,b)=>a+b,0)/rqR.length < 3) risks.push('Revenue quality is below average — income may be unpredictable or non-recurring')
+
+  if (ratedQ.length < 15) missingInfo.push(`Business quality incomplete (${ratedQ.length}/25 items rated)`)
+  if (ratedDep.length < 8) missingInfo.push(`Owner dependency incomplete (${ratedDep.length}/12 items rated)`)
+  if (unassessed > 8) missingInfo.push(`${unassessed} red flag categories not yet assessed`)
+  if (ratedFit.length < 7) missingInfo.push(`Personal fit incomplete (${ratedFit.length}/9 items scored)`)
+  if (buyBoxScore === 0) missingInfo.push('No Buy Box defined — define yours to improve recommendation accuracy')
+
+  switch (recommendation) {
+    case 'reject':
+      nextActions.push('Do not advance this opportunity')
+      if (breakers > 0) nextActions.push('Document the deal-breaker finding for reference when screening similar opportunities')
+      break
+    case 'park':
+      nextActions.push('Set a review date 3–6 months out — circumstances may change')
+      nextActions.push('Clarify red flag concerns before revisiting')
+      nextActions.push('Continue pipeline search — do not hold capacity for a parked opportunity')
+      break
+    case 'gather-info':
+      nextActions.push('Complete the business quality and owner dependency assessments')
+      nextActions.push('Assess all outstanding red flag categories')
+      nextActions.push('Request an information memorandum or management accounts from the broker')
+      break
+    case 'investigate':
+      nextActions.push('Schedule a preliminary call with the broker or seller')
+      nextActions.push('Request last 3 years\' accounts and recent management accounts')
+      nextActions.push('Prepare targeted questions on each amber and red flag')
+      nextActions.push('Engage an accountant for a preliminary financial review')
+      break
+    case 'due-diligence':
+      nextActions.push('Request the full information memorandum')
+      nextActions.push('Appoint a corporate finance adviser and solicitor')
+      nextActions.push('Commission financial, legal, and commercial due diligence')
+      nextActions.push('Draft indicative heads of terms')
+      break
+    case 'offer':
+      nextActions.push('Consider submitting a letter of intent or indicative offer')
+      nextActions.push('Appoint a corporate finance adviser to structure and model the deal')
+      nextActions.push('Instruct a solicitor to review all legal documentation')
+      nextActions.push('Engage a commercial lender or finance broker to model acquisition finance')
+      break
+  }
+
+  return {
+    recommendation, personalFitScore, businessQualityScore, ownerDependencyScore,
+    redFlagCounts: { breakers, reds, ambers },
+    blendedScore,
+    reasons: reasons.slice(0, 6),
+    risks: risks.slice(0, 5),
+    missingInfo,
+    nextActions,
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+
 export function buyBoxThesis(bb: BuyBoxDraft, sectorScores: ReturnType<typeof computeAllSectorScores>): string {
   const topNames = (bb.sectorsPreferred || [])
     .map((id) => SECTOR_DB.find((s) => s.id === id)?.name)

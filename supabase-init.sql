@@ -127,6 +127,12 @@ CREATE TABLE IF NOT EXISTS opportunity (
   "updatedAt"        TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- If the opportunity table already exists, add the analysis columns:
+ALTER TABLE opportunity ADD COLUMN IF NOT EXISTS "qualityScores"  TEXT NOT NULL DEFAULT '';
+ALTER TABLE opportunity ADD COLUMN IF NOT EXISTS "ownerDepScores" TEXT NOT NULL DEFAULT '';
+ALTER TABLE opportunity ADD COLUMN IF NOT EXISTS "redFlags"       TEXT NOT NULL DEFAULT '';
+ALTER TABLE opportunity ADD COLUMN IF NOT EXISTS "fitScores"      TEXT NOT NULL DEFAULT '';
+
 CREATE TABLE IF NOT EXISTS "buyBox" (
   "id"                       UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   "userId"                   UUID        NOT NULL UNIQUE REFERENCES "user"("id") ON DELETE CASCADE,

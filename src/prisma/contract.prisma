@@ -123,6 +123,10 @@ model Opportunity {
   chStatus         String            @default("")
   chSicCodes       String            @default("")
   chIncorporatedOn String            @default("")
+  qualityScores    String            @default("")
+  ownerDepScores   String            @default("")
+  redFlags         String            @default("")
+  fitScores        String            @default("")
   createdAt        TimestamptzString @default(now())
   updatedAt        temporal.updatedAtString()
 }
