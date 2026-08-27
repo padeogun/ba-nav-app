@@ -46,7 +46,7 @@ export default function LifestyleForm({ initialData }: { initialData: LifestyleD
         </p>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>Lifestyle fit</h1>
         <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13.5, lineHeight: 1.55, maxWidth: 640 }}>
-          Hard limits here become hard exclusions later — we won't just quietly lower a score for a business that structurally breaks your limits.
+          Hard limits here become hard exclusions later — we won't just quietly lower a score for a business that structurally breaks your limits. Answer for the life you are willing to live as an owner, not the life you ideally want.
         </p>
       </div>
 
@@ -56,21 +56,78 @@ export default function LifestyleForm({ initialData }: { initialData: LifestyleD
             Desired weekly hours: <span style={{ fontFamily: 'var(--mono)', color: 'var(--brass)' }}>{data.weeklyHours}h</span>
           </label>
           <input className="ban-slider" type="range" min="15" max="70" value={data.weeklyHours} onChange={(e) => set('weeklyHours', parseInt(e.target.value))} />
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 5 }}>Most SME owner-operators work 45–60 hours per week during the first 2–3 years. Set a realistic ceiling, not an aspiration.</div>
         </div>
         <div>
           <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 8 }}>
             Maximum commute: <span style={{ fontFamily: 'var(--mono)', color: 'var(--brass)' }}>{data.maxCommute} min</span>
           </label>
           <input className="ban-slider" type="range" min="0" max="120" step="5" value={data.maxCommute} onChange={(e) => set('maxCommute', parseInt(e.target.value))} />
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 5 }}>One-way travel time to the business premises. Businesses beyond this limit will be flagged incompatible.</div>
         </div>
 
-        {selectField('weekendTolerance', 'Weekend work tolerance', [['never', 'Never'], ['occasional', 'Occasional'], ['regular', 'Regular']])}
-        {selectField('emergencyTolerance', 'Emergency-call tolerance', [['none', 'None'], ['sometimes', 'Sometimes'], ['anytime', 'Anytime']])}
-        {selectField('travelTolerance', 'Travel tolerance', [['none', 'None'], ['local', 'Local'], ['regional', 'Regional'], ['national', 'National']])}
-        {selectField('customerFacing', 'Comfortable being customer-facing?', [['yes', 'Yes'], ['some', 'Some'], ['no', 'Prefer not']])}
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Weekend work tolerance</label>
+          <select className="ban-select" value={data.weekendTolerance} onChange={(e) => set('weekendTolerance', e.target.value as any)}>
+            <option value="never">Never</option>
+            <option value="occasional">Occasional</option>
+            <option value="regular">Regular</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Retail, hospitality, healthcare, and security typically require regular weekend presence.</div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Emergency-call tolerance</label>
+          <select className="ban-select" value={data.emergencyTolerance} onChange={(e) => set('emergencyTolerance', e.target.value as any)}>
+            <option value="none">None</option>
+            <option value="sometimes">Sometimes</option>
+            <option value="anytime">Anytime</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Equipment failures, staff no-shows, urgent client issues, or security incidents can occur outside business hours.</div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Travel tolerance</label>
+          <select className="ban-select" value={data.travelTolerance} onChange={(e) => set('travelTolerance', e.target.value as any)}>
+            <option value="none">None</option>
+            <option value="local">Local</option>
+            <option value="regional">Regional</option>
+            <option value="national">National</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Required for site visits, client meetings, or managing multi-location operations. Caps sectors with high travel demands.</div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Comfortable being customer-facing?</label>
+          <select className="ban-select" value={data.customerFacing} onChange={(e) => set('customerFacing', e.target.value as any)}>
+            <option value="yes">Yes</option>
+            <option value="some">Some</option>
+            <option value="no">Prefer not</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>In most small businesses the owner is the primary point of client contact, especially in the first 1–2 years.</div>
+        </div>
+
         {selectField('relocate', 'Willing to relocate?', [['yes', 'Yes'], ['maybe', 'Maybe'], ['no', 'No']])}
-        {selectField('remotePref', 'Remote / hybrid preference', [['remote', 'Remote'], ['hybrid', 'Hybrid'], ['onsite', 'On-site']])}
-        {selectField('longTermInvolvement', 'Long-term desired involvement', [['owner-operator', 'Owner-operator'], ['owner-manager', 'Owner-manager'], ['semi-passive', 'Semi-passive']])}
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Remote / hybrid preference</label>
+          <select className="ban-select" value={data.remotePref} onChange={(e) => set('remotePref', e.target.value as any)}>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="onsite">On-site</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Most service businesses require on-site presence. Remote or hybrid ownership usually requires a strong, trusted management layer already in place.</div>
+        </div>
+
+        <div>
+          <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>Long-term desired involvement</label>
+          <select className="ban-select" value={data.longTermInvolvement} onChange={(e) => set('longTermInvolvement', e.target.value as any)}>
+            <option value="owner-operator">Owner-operator — I run it day-to-day</option>
+            <option value="owner-manager">Owner-manager — I manage the managers</option>
+            <option value="semi-passive">Semi-passive — board-level oversight only</option>
+          </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>This reflects your end-state, not year one — almost all buyers start more hands-on than they intend to finish.</div>
+        </div>
 
         <div>
           <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>
@@ -83,6 +140,7 @@ export default function LifestyleForm({ initialData }: { initialData: LifestyleD
             onChange={(e) => set('minPersonalIncome', parseFloat(e.target.value) || 0)}
             placeholder="£"
           />
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Gross annual amount you must draw from the business to cover personal commitments. Businesses unable to support this will be excluded.</div>
         </div>
       </div>
 

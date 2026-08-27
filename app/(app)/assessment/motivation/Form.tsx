@@ -39,7 +39,7 @@ export default function MotivationForm({ initialData }: { initialData: Motivatio
         </p>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>Motivation</h1>
         <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13.5, lineHeight: 1.55, maxWidth: 640 }}>
-          Rate your agreement with each statement (1 = strongly disagree, 5 = strongly agree). These help identify the depth and durability of your motivation for ownership.
+          Rate your agreement with each statement (1 = strongly disagree, 5 = strongly agree). These help identify the depth and durability of your motivation for ownership. A score above 70% is a strong signal; below 50% usually means unresolved hesitations worth examining before proceeding.
         </p>
       </div>
 
@@ -78,15 +78,18 @@ export default function MotivationForm({ initialData }: { initialData: Motivatio
       )}
 
       <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 3, padding: 22, marginBottom: 8 }}>
-        <p style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 14 }}>
+        <p style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: 4 }}>
           Reflection (optional — not scored)
         </p>
-        {[
-          ['why', 'Why do you want to own a business?'],
-          ['changes', 'What would change for you if you succeeded?'],
-          ['twoYears', 'What does your life look like in two years as an owner?'],
-          ['failureDespiteProfit', 'What would "failure" look like even if the business was profitable?'],
-        ].map(([key, label]) => (
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 14, lineHeight: 1.5 }}>
+          These questions are for your own clarity. Your answers are saved but do not affect any score. Be as candid as you like — honest answers here tend to surface the real reasons behind the numbers above.
+        </p>
+        {([
+          ['why', 'Why do you want to own a business?', 'e.g. financial independence, building something lasting, escaping a job you dislike, creating employment…'],
+          ['changes', 'What would change for you if you succeeded?', 'e.g. financial security, more time with family, a sense of achievement, leaving employment…'],
+          ['twoYears', 'What does your life look like in two years as an owner?', 'Think practically: where are you working, what are you doing day-to-day, what has improved?'],
+          ['failureDespiteProfit', 'What would "failure" look like even if the business was profitable?', 'e.g. you are exhausted and miserable, the business owns you, family relationships have suffered…'],
+        ] as [string, string, string][]).map(([key, label, placeholder]) => (
           <div key={key} style={{ marginBottom: 16 }}>
             <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>{label}</label>
             <textarea
@@ -94,6 +97,7 @@ export default function MotivationForm({ initialData }: { initialData: Motivatio
               rows={3}
               value={(data as any)[key]}
               onChange={(e) => setField(key as any, e.target.value)}
+              placeholder={placeholder}
               style={{ resize: 'vertical' }}
             />
           </div>

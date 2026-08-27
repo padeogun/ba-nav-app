@@ -32,7 +32,7 @@ export default function CapabilityForm({ initialSkills }: { initialSkills: Recor
         </p>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>Capability</h1>
         <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13.5, lineHeight: 1.55, maxWidth: 640 }}>
-          Rate your current level in each skill (1 = no experience, 5 = expert), then tick "Enjoy" if it is work you actively enjoy. Both matter: enjoyment without skill is enthusiasm; skill without enjoyment is a job you do not want.
+          Rate your current level in each skill (1 = no experience, 5 = expert), then tick "Enjoy" if it is work you actively enjoy. Both matter: enjoyment without skill is enthusiasm; skill without enjoyment is a job you do not want. Skills you both rate highly <em>and</em> enjoy give the strongest match boost in the sector analysis.
         </p>
       </div>
 

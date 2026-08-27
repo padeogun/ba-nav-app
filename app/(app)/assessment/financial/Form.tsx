@@ -67,19 +67,19 @@ export default function FinancialForm({ initialData }: { initialData: FinancialD
         </p>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>Financial readiness</h1>
         <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13.5, lineHeight: 1.55, maxWidth: 640 }}>
-          Separating what you have, what you can afford to lose, and what you need in reserve — never deploy every pound of liquidity into a purchase price.
+          Separating what you have, what you can afford to lose, and what you need in reserve — never deploy every pound of liquidity into a purchase price. Enter all figures as annual amounts in pounds (£). Estimates are fine; precision comes later.
         </p>
       </div>
 
       <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 3, padding: 22, marginBottom: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        {numField('capitalAvailable', 'Acquisition capital available')}
-        {numField('riskCapital', 'Amount genuinely prepared to risk', 'Should usually be less than the above')}
-        {numField('existingDebt', 'Existing debt commitments')}
-        {numField('additionalCapital', 'Additional capital available post-acquisition')}
-        {numField('desiredSize', 'Desired adjusted EBITDA of target (£)')}
-        {numField('minHouseholdIncome', 'Minimum household income needed')}
-        {numField('desiredDrawings', 'Desired owner salary / drawings')}
-        {numField('maxGuarantee', 'Maximum acceptable personal guarantee')}
+        {numField('capitalAvailable', 'Acquisition capital available', 'All funds available for a purchase — cash, ISA drawdowns, gift equity. Exclude emergency savings.')}
+        {numField('riskCapital', 'Amount genuinely prepared to risk', 'The maximum you could lose and still be financially stable. This is your real exposure ceiling — be honest.')}
+        {numField('existingDebt', 'Existing debt commitments (£/yr)', 'Annual total of existing repayments: mortgage, car finance, personal loans. Used to assess residual capacity.')}
+        {numField('additionalCapital', 'Additional capital available post-acquisition', 'Working capital you could inject after completion — e.g. for stock, CAPEX, or cashflow gaps in year one.')}
+        {numField('desiredSize', 'Desired adjusted EBITDA of target (£)', 'Earnings before interest, tax, depreciation & amortisation — a proxy for the business\'s underlying profit. Typical acquisition multiples are 3–5× EBITDA.')}
+        {numField('minHouseholdIncome', 'Minimum household income needed (£/yr)', 'Total household income (all sources) required to cover living costs and commitments. This is your hard floor.')}
+        {numField('desiredDrawings', 'Desired owner salary / drawings (£/yr)', 'What you want the business to pay you annually. Factor in employer\'s NI if taking a formal salary.')}
+        {numField('maxGuarantee', 'Maximum acceptable personal guarantee (£)', 'Many lenders require directors to personally backstop the business loan. Enter the maximum you would sign for.')}
         <div>
           <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>
             Personal reserves (months of expenses)
@@ -89,6 +89,7 @@ export default function FinancialForm({ initialData }: { initialData: FinancialD
               <option key={m} value={m}>{m} months</option>
             ))}
           </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>Liquid savings kept separate from acquisition capital, covering personal living costs. 6+ months is the recommended minimum before completing a deal.</div>
         </div>
         <div>
           <label style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', display: 'block', marginBottom: 5 }}>
@@ -99,6 +100,7 @@ export default function FinancialForm({ initialData }: { initialData: FinancialD
             <option value="moderate">Moderate — standard bank-supported deal</option>
             <option value="high">High — comfortable with significant leverage</option>
           </select>
+          <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4 }}>How much debt relative to the purchase price you are comfortable carrying. Most SME bank deals use 50–70% senior debt.</div>
         </div>
       </div>
 

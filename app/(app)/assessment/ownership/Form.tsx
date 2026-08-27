@@ -42,14 +42,23 @@ export default function OwnershipForm({
         </p>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 500, color: 'var(--ink)', margin: 0 }}>Ownership style</h1>
         <p style={{ marginTop: 8, color: 'var(--muted)', fontSize: 13.5, lineHeight: 1.55, maxWidth: 640 }}>
-          Rate each statement (1 = not me at all, 5 = very much me). Your pattern across the three categories reveals whether you lean towards hands-on operator, people-focused builder, or strategic owner.
+          Rate each statement (1 = not me at all, 5 = very much me). Your pattern across the three categories reveals whether you lean towards hands-on operator, people-focused builder, or strategic owner. Most buyers sit across two styles — the result shows your split, not a single label.
         </p>
       </div>
 
-      {Object.entries(OWNERSHIP_STYLE_ITEMS).map(([cat, items]) => (
+      {Object.entries(OWNERSHIP_STYLE_ITEMS).map(([cat, items]) => {
+        const STYLE_DESC: Record<string, string> = {
+          'Operator': 'You are energised by being in the thick of it — serving customers, solving operational problems, and leading from the front.',
+          'Manager / Builder': 'You prefer building and empowering teams to handle operations while you focus on growth, systems, and culture.',
+          'Investor / Strategic owner': 'You want to own and direct, not manage day-to-day — comfortable delegating operational control entirely to management.',
+        }
+        return (
         <div key={cat} style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 3, padding: 22, marginBottom: 12 }}>
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: STYLE_COLORS[cat] ?? 'var(--brass)', marginBottom: 16 }}>
-            {cat}
+          <div style={{ marginBottom: 14 }}>
+            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: STYLE_COLORS[cat] ?? 'var(--brass)', marginBottom: 4 }}>
+              {cat}
+            </div>
+            {STYLE_DESC[cat] && <div style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5, maxWidth: 540 }}>{STYLE_DESC[cat]}</div>}
           </div>
           {items.map((text, i) => (
             <LikertRow
@@ -60,7 +69,8 @@ export default function OwnershipForm({
             />
           ))}
         </div>
-      ))}
+        )
+      })}
 
       {Object.values(pcts).some((v) => v > 0) && (
         <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: 3, padding: '16px 20px', marginBottom: 8 }}>
