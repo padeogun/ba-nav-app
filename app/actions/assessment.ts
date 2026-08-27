@@ -42,10 +42,8 @@ export async function saveMotivation(payload: {
     }
     revalidatePath('/dashboard')
     return { error: null }
-  } catch (e: any) {
-    const detail = JSON.stringify({ msg: e?.message, why: e?.why, code: e?.code, cause: String(e?.cause ?? '') }, null, 0)
-    console.error('[saveMotivation]', detail)
-    return { error: detail }
+  } catch (e) {
+    return { error: String(e) }
   }
 }
 
