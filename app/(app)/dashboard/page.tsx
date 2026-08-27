@@ -224,24 +224,29 @@ export default async function DashboardPage() {
 
       {/* Summary score cards */}
       <div className="ban-grid-4" style={{ gap: '12px', marginBottom: '20px' }}>
-        {summaryCards.map((c) => (
-          <Link key={c.label} href={c.href} style={{ textDecoration: 'none' }}>
-            <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: '3px', padding: '16px', cursor: 'pointer' }}>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: '10px', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-                {c.label}
-              </div>
-              <div style={{ fontFamily: 'var(--mono)', fontSize: '22px', fontWeight: 700, color: c.done ? scoreColor(c.pct) : 'var(--muted)', marginBottom: '4px' }}>
-                {c.value}
-              </div>
-              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{c.sub}</div>
-              {c.done && c.pct > 0 && (
-                <div className="ban-progress-track" style={{ marginTop: '8px' }}>
-                  <div className="ban-progress-fill" style={{ width: `${c.pct}%`, background: scoreColor(c.pct) }} />
+        {summaryCards.map((c) => {
+          const valueFontSize = c.value.length <= 8 ? '22px' : c.value.length <= 16 ? '16px' : '13px'
+          return (
+            <Link key={c.label} href={c.href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
+              <div style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: '3px', padding: '16px', cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+                <div style={{ fontFamily: 'var(--mono)', fontSize: '10px', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+                  {c.label}
                 </div>
-              )}
-            </div>
-          </Link>
-        ))}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: valueFontSize, fontWeight: 700, color: c.done ? scoreColor(c.pct) : 'var(--muted)', marginBottom: '4px', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                    {c.value}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.45 }}>{c.sub}</div>
+                </div>
+                {c.done && c.pct > 0 && (
+                  <div className="ban-progress-track" style={{ marginTop: '10px' }}>
+                    <div className="ban-progress-fill" style={{ width: `${c.pct}%`, background: scoreColor(c.pct) }} />
+                  </div>
+                )}
+              </div>
+            </Link>
+          )
+        })}
       </div>
 
       {/* Radar + Top sectors */}
