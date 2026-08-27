@@ -42,9 +42,10 @@ export async function saveMotivation(payload: {
     }
     revalidatePath('/dashboard')
     return { error: null }
-  } catch (e) {
-    console.error('[saveMotivation]', String(e))
-    return { error: String(e) }
+  } catch (e: any) {
+    const detail = e?.why ?? e?.cause?.message ?? e?.message ?? String(e)
+    console.error('[saveMotivation]', detail)
+    return { error: `${String(e)} — ${detail}` }
   }
 }
 
